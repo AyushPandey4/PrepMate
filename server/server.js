@@ -8,6 +8,9 @@ import interviewRouter from './routes/interview.js';
 
 const app = express();
 
+// Trust reverse proxy headers (required on Render, Heroku, etc.)
+app.set('trust proxy', 1);
+
 // Middleware 
 const allowedOrigins = [
   config.clientUrl?.replace(/\/$/, ''),
