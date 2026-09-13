@@ -1,5 +1,7 @@
 import supabase from './supabase';
 
+const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+
 async function getAuthHeaders() {
   const { data: { session } } = await supabase.auth.getSession();
 
@@ -39,7 +41,7 @@ export async function extractResume(file) {
   const formData = new FormData();
   formData.append('resume', file);
 
-  const res = await fetch('/api/resume/extract', {
+  const res = await fetch(`${API_BASE}/api/resume/extract`, {
     method: 'POST',
     headers: authHeaders,
     body: formData,
@@ -54,7 +56,7 @@ export async function extractResume(file) {
 export async function createInterview({ targetRole, targetCompany, mode, resumeProfile }) {
   const authHeaders = await getAuthHeaders();
 
-  const res = await fetch('/api/interviews', {
+  const res = await fetch(`${API_BASE}/api/interviews`, {
     method: 'POST',
     headers: { ...authHeaders, 'Content-Type': 'application/json' },
     body: JSON.stringify({ targetRole, targetCompany, mode, resumeProfile }),
@@ -67,7 +69,7 @@ export async function createInterview({ targetRole, targetCompany, mode, resumeP
 export async function getInterviews() {
   const authHeaders = await getAuthHeaders();
 
-  const res = await fetch('/api/interviews', {
+  const res = await fetch(`${API_BASE}/api/interviews`, {
     headers: authHeaders,
   });
 
@@ -78,7 +80,7 @@ export async function getInterviews() {
 export async function getInterview(id) {
   const authHeaders = await getAuthHeaders();
 
-  const res = await fetch(`/api/interviews/${id}`, {
+  const res = await fetch(`${API_BASE}/api/interviews/${id}`, {
     headers: authHeaders,
   });
 
@@ -89,7 +91,7 @@ export async function getInterview(id) {
 export async function sendMessage(id, answer) {
   const authHeaders = await getAuthHeaders();
 
-  const res = await fetch(`/api/interviews/${id}/message`, {
+  const res = await fetch(`${API_BASE}/api/interviews/${id}/message`, {
     method: 'POST',
     headers: { ...authHeaders, 'Content-Type': 'application/json' },
     body: JSON.stringify({ answer }),
@@ -102,7 +104,7 @@ export async function sendMessage(id, answer) {
 export async function completeInterview(id) {
   const authHeaders = await getAuthHeaders();
 
-  const res = await fetch(`/api/interviews/${id}/complete`, {
+  const res = await fetch(`${API_BASE}/api/interviews/${id}/complete`, {
     method: 'POST',
     headers: authHeaders,
   });
@@ -114,7 +116,7 @@ export async function completeInterview(id) {
 export async function getFeedback(id) {
   const authHeaders = await getAuthHeaders();
 
-  const res = await fetch(`/api/interviews/${id}/feedback`, {
+  const res = await fetch(`${API_BASE}/api/interviews/${id}/feedback`, {
     headers: authHeaders,
   });
 

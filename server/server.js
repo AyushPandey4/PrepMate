@@ -9,8 +9,20 @@ import interviewRouter from './routes/interview.js';
 const app = express();
 
 // Middleware 
+const allowedOrigins = [
+  config.clientUrl?.replace(/\/$/, ''),
+  'http://localhost:5173',
+].filter(Boolean);
+
 app.use(cors({
-  origin: config.clientUrl,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    const cleanOrigin = origin.replace(/\/$/, '');
+    if (allowedOrigins.includes(cleanOrigin)) {
+      return callback(null, true);
+    }
+    return callback(new Error(`CORS blocked for origin: ${origin}`));
+  },
   credentials: true,
 }));
 
