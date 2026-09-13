@@ -1,0 +1,44 @@
+import express from 'express';
+import cors from 'cors';
+import { config } from './config/index.js';
+import { apiLimiter, aiLimiter } from './middleware/rateLimiter.js';
+import healthRouter from './routes/health.js';
+import resumeRouter from './routes/resume.js';
+import interviewRouter from './routes/interview.js';
+
+const app = express();
+
+// Middleware 
+app.use(cors({
+  origin: config.clientUrl,
+  credentials: true,
+}));
+
+// Parse incoming JSON request bodies.
+app.use(express.json());
+
+// Global rate limiting across API endpoints
+app.use('/api', apiLimiter);
+
+// Routes 
+app.use('/api/health', healthRouter);
+app.use('/api/resume', aiLimiter, resumeRouter);
+app.use('/api/interviews', aiLimiter, interviewRouter);
+
+// 404 Handler 
+app.use((_req, res) => {
+  res.status(404).json({ error: 'Route not found' });
+});
+
+//  Global Error Handler 
+app.use((err, _req, res, _next) => {
+  console.error('Unhandled error:', err.message);
+  res.status(err.status || 500).json({
+    error: err.message || 'Internal server error',
+  });
+});
+
+// Start Server 
+app.listen(config.port, () => {
+  console.log(`✅ PrepMate server running on http://localhost:${config.port}`);
+});
